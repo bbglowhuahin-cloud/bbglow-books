@@ -1,0 +1,139 @@
+/* BB Glow Books — ธีมเดียวกับ POS (THEME 3.0 ทอง–แดง) */
+:root{
+  --gold:#C9A15B;--gold-light:#F0D9A8;--gold-dark:#8A6A30;
+  --cream:#FBF6F2;--rose:#B76E79;--rose-light:#F6DDD3;
+  --crimson:#9E1B32;--crimson-light:#FBE9EC;
+  --brown:#5A2A33;--text:#3A2A2C;--muted:#8E6F71;
+  --white:#fff;--success:#3F7A55;--danger:#9E1B32;--warn:#B8893E;--blue:#4A7FC0;
+  --line:#EEDDC6;--paper:#fff;
+  --goldgrad:linear-gradient(135deg,#B8893E 0%,#E9C98E 38%,#C9A15B 62%,#F3DDA8 100%);
+  --shadow:0 2px 10px rgba(90,42,51,.07);--shadow-lg:0 10px 30px rgba(90,42,51,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Sarabun',system-ui,sans-serif;background:var(--cream);color:var(--text);font-size:15px;line-height:1.45}
+a{color:var(--crimson)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-weight:700}
+.serif{font-family:'Playfair Display',Georgia,serif;letter-spacing:1px}
+.hide{display:none!important}
+.muted{color:var(--muted)}
+.right{text-align:right}
+.center{text-align:center}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.pos{color:var(--success)}.neg{color:var(--danger)}
+.small{font-size:.82rem}
+.mt{margin-top:12px}.mb{margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+
+/* ---------- โครง ---------- */
+#app{display:flex;min-height:100vh}
+.side{width:220px;background:linear-gradient(180deg,#5A2A33 0%,#9E1B32 70%,#B8893E 140%);color:#fff;padding:18px 12px;position:sticky;top:0;height:100vh;flex-shrink:0;display:flex;flex-direction:column}
+.brand{font-family:'Playfair Display',serif;font-size:1.25rem;letter-spacing:2px;padding:4px 8px 14px;border-bottom:1px solid rgba(255,255,255,.2);margin-bottom:10px}
+.brand span{color:#F3DDA8}
+.brand small{display:block;font-family:'Sarabun';font-size:.7rem;letter-spacing:0;opacity:.8;font-weight:400}
+.nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:#fff;text-decoration:none;font-weight:500;margin:2px 0;opacity:.9}
+.nav a:hover{background:rgba(255,255,255,.1)}
+.nav a.active{background:var(--goldgrad);color:var(--brown);font-weight:700;box-shadow:inset 0 0 0 1px var(--crimson)}
+.nav .ic{width:22px;text-align:center}
+.side .foot{margin-top:auto;font-size:.75rem;opacity:.85;padding:8px}
+.side .foot b{display:block;font-size:.85rem}
+.main{flex:1;min-width:0;padding:18px 22px 90px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.topbar h1{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--brown);letter-spacing:1px}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:var(--goldgrad);color:var(--brown);border:1px solid var(--crimson)}
+.badge.gray{background:#eee;color:#555;border-color:#ddd}
+.badge.red{background:var(--crimson-light);color:var(--crimson);border-color:var(--crimson)}
+.badge.green{background:#E6F2EA;color:var(--success);border-color:var(--success)}
+.badge.blue{background:#E6EEF8;color:var(--blue);border-color:var(--blue)}
+.bottomnav{display:none}
+
+/* ---------- การ์ด ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:12px}
+.card-title{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--brown);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--gold-light),transparent)}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .lbl{font-size:.78rem;color:var(--muted)}
+.stat .val{font-size:1.45rem;font-weight:700;color:var(--brown);font-variant-numeric:tabular-nums;margin-top:2px}
+.stat .sub{font-size:.75rem;color:var(--muted);margin-top:2px}
+.stat.hero{background:linear-gradient(120deg,#5A2A33 0%,#9E1B32 55%,#B8893E 100%);color:#fff;border:none}
+.stat.hero .lbl,.stat.hero .sub{color:rgba(255,255,255,.85)}.stat.hero .val{color:#F3DDA8}
+
+/* ---------- ฟอร์ม ---------- */
+label.f{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:600}
+input,select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--gold-light);border-radius:10px;background:var(--cream);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);background:#fff}
+input[type=checkbox],input[type=radio]{width:auto}
+textarea{min-height:60px;resize:vertical}
+.field{margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:.15s;font-size:.9rem;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff;box-shadow:0 4px 14px rgba(201,161,91,.3)}
+.btn-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold-dark)}
+.btn-rose{background:linear-gradient(135deg,#A05040,var(--rose));color:#fff}
+.btn-red{background:var(--crimson);color:#fff}
+.btn-ghost{background:transparent;color:var(--crimson);padding:6px 10px}
+.btn-sm{padding:5px 10px;font-size:.8rem;border-radius:9px}
+.btn:hover{transform:translateY(-1px)}
+.seg{display:inline-flex;border:1.5px solid var(--gold-light);border-radius:12px;overflow:hidden}
+.seg button{border:none;background:var(--cream);padding:7px 14px;cursor:pointer;color:var(--muted);font-weight:600;font-size:.85rem}
+.seg button.on{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#fff}
+
+/* ---------- ตาราง ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem}
+.tbl th{font-size:.75rem;color:var(--muted);text-align:left;padding:8px 8px;border-bottom:2px solid var(--gold-light);font-weight:700;white-space:nowrap}
+.tbl td{padding:8px 8px;border-bottom:1px solid #F3EAE0;vertical-align:top}
+.tbl tr:hover td{background:#FFF9F1}
+.tbl tfoot td{font-weight:700;border-top:2px solid var(--gold-light);border-bottom:none}
+.tbl-wrap{overflow-x:auto}
+.tag{display:inline-block;padding:1px 8px;border-radius:8px;font-size:.72rem;background:#F3EAE0;color:var(--brown)}
+.tag.cash{background:#E9F3EC;color:var(--success)}.tag.bank{background:#E8EEF8;color:var(--blue)}.tag.dir{background:#F6E6E8;color:var(--crimson)}
+.pill{padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700}
+
+/* ---------- โมดัล / toast ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(58,42,44,.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:14px}
+.modal{background:#fff;border-radius:18px;padding:18px 20px;max-width:680px;width:100%;max-height:92vh;overflow:auto;box-shadow:var(--shadow-lg)}
+.modal h2{font-family:'Playfair Display',serif;color:var(--brown);font-size:1.1rem;margin-bottom:12px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--brown);color:#fff;padding:10px 18px;border-radius:30px;opacity:0;transition:.25s;z-index:300;pointer-events:none;font-size:.9rem;max-width:90vw}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.alert{padding:10px 14px;border-radius:12px;font-size:.88rem;margin-bottom:10px;border:1px solid}
+.alert.warn{background:#FFF6E5;border-color:#F0D9A8;color:#7A5A20}
+.alert.red{background:var(--crimson-light);border-color:#E8B4BC;color:var(--crimson)}
+.alert.ok{background:#E9F3EC;border-color:#BCDCC6;color:var(--success)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+/* ---------- login ---------- */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 10%,#FBE9EC,transparent 50%),var(--cream)}
+.login .box{background:#fff;border-radius:22px;padding:28px 26px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);border:1px solid var(--line)}
+.login .logo{font-family:'Playfair Display',serif;font-size:1.8rem;text-align:center;color:var(--brown);letter-spacing:2px}
+.login .logo span{color:var(--gold-dark)}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.roles button{border:1.5px solid var(--gold-light);background:var(--cream);border-radius:12px;padding:10px 6px;cursor:pointer;font-size:.82rem}
+.roles button.on{border-color:var(--gold-dark);background:linear-gradient(135deg,#FFF6E8,#FFF0D0);font-weight:700}
+
+/* ---------- print 50 ทวิ ---------- */
+.cert{font-family:'Sarabun';font-size:13px;color:#000;background:#fff;padding:20px;max-width:760px;margin:auto;border:1px solid #000}
+.cert h3{text-align:center;font-size:15px}
+.cert table{width:100%;border-collapse:collapse;margin-top:8px}
+.cert td,.cert th{border:1px solid #000;padding:4px 6px;font-size:12px}
+.cert .nb td{border:none;padding:2px 4px}
+@media print{body{background:#fff}.side,.topbar,.noprint,.bottomnav{display:none!important}.main{padding:0}.card{box-shadow:none;border:none}}
+
+/* ---------- มือถือ ---------- */
+@media (max-width:860px){
+  #app{display:block}
+  .side{display:none}
+  .main{padding:12px 12px 84px}
+  .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--gold);justify-content:space-around;padding:6px 4px;z-index:150;box-shadow:0 -4px 14px rgba(90,42,51,.08)}
+  .bottomnav a{text-decoration:none;color:var(--muted);font-size:.66rem;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 6px;border-radius:10px;min-width:54px}
+  .bottomnav a .ic{font-size:1.15rem}
+  .bottomnav a.active{color:var(--crimson);background:var(--crimson-light);font-weight:700}
+  .stat .val{font-size:1.2rem}
+  .tbl{font-size:.82rem}
+  .modal{padding:14px}
+}
