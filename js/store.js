@@ -75,7 +75,7 @@ function localBackend() {
 function demoSales() {
   const cached = localStorage.getItem('bbbooks:demoSales');
   if (cached) return JSON.parse(cached);
-  const names = ['คุณ จรัสศรี กลิ่นศรี', 'คุณ ปริศนา พิมพ์น้อย', 'คุณ ศิริวรรณ อู่รอด', 'คุณ ทวีเกียรติ สารทอง', 'คุณ วัชรี ช้อยชดดั้ม', 'ลูกค้าทั่วไป', 'คุณ กัญญา พูนเพิ่ม', 'คุณ ณพัชร์ลินี ภัทรทิวานันท์'];
+  const names = ['คุณ สมมติ หนึ่ง', 'คุณ สมมติ สอง', 'คุณ สมมติ สาม', 'คุณ สมมติ สี่', 'คุณ สมมติ ห้า', 'ลูกค้าทั่วไป', 'คุณ สมมติ หก', 'คุณ สมมติ เจ็ด'];
   const combos = [
     [[{ name: 'BB Super Locked หน้า', price: 1999 }, { name: 'BB Super Locked คอ', price: 399 }], []],
     [[{ name: 'BB Super Locked หน้า', price: 1999 }], []],

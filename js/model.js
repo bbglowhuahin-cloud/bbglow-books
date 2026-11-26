@@ -3,8 +3,8 @@ import { round2, sum, monthKey, groupBy, pad } from './util.js';
 
 export const CHANNELS = [
   { id: 'CSH001', name: 'เงินสด', short: 'เงินสด', type: 'cash' },
-  { id: 'BSV001', name: 'กสิกร บัญชีรับ 234-8-07175-3', short: 'กสิกร รับ', type: 'bank', acct: '2348071753', mask: 'X1753' },
-  { id: 'BSV002', name: 'กสิกร บัญชีจ่าย 234-8-08044-2', short: 'กสิกร จ่าย', type: 'bank', acct: '2348080442', mask: 'X0442' },
+  { id: 'BSV001', name: 'กสิกร บัญชีรับ (…1753)', short: 'กสิกร รับ', type: 'bank', mask: 'X1753' },
+  { id: 'BSV002', name: 'กสิกร บัญชีจ่าย (…0442)', short: 'กสิกร จ่าย', type: 'bank', mask: 'X0442' },
   { id: 'DIR', name: 'เงินกู้ยืมกรรมการ (อาจารย์)', short: 'กรรมการ', type: 'director' },
 ];
 export const chan = id => CHANNELS.find(c => c.id === id) || { id, name: id, short: id, type: '?' };
@@ -49,7 +49,7 @@ export const DEFAULT_SETTINGS = {
   company: { name: 'บริษัท บีบี โกลว์ หัวหิน จำกัด', taxId: '', address: '11/48 ซ.หมู่บ้านสมอโพรง ต.หัวหิน อ.หัวหิน จ.ประจวบคีรีขันธ์ 77110', phone: '' },
   fiscalStartMonth: 10,
   opening: { date: '2026-10-01', balances: { CSH001: 1021319.84, BSV001: 0, BSV002: 29536, DIR: 0 }, cashConfirmed: false, note: '' },
-  director: { name: 'นาย เฉลิมชัย', keywords: ['เฉลิมชัย', 'CHALERMCHAI'] },
+  director: { name: '', keywords: [] }, // ตั้งค่าจริงในหน้า ตั้งค่า (เก็บใน Firestore ไม่อยู่ในโค้ด)
   posSyncFrom: '2026-10-01',
   posLastSync: null,
   requireAuth: false,
