@@ -23,7 +23,7 @@ export function render() {
       ${CHANNELS.map(c => `<div class="field"><label class="f">${esc(c.name)}${c.type === 'director' ? ' — ใส่ติดลบถ้าบริษัทติดหนี้กรรมการอยู่ก่อน' : ''}</label><input name="bal.${c.id}" type="number" step="0.01" value="${op.balances[c.id]}" ${dis}></div>`).join('')}
       <div class="field"><label><input type="checkbox" name="cashConfirmed" ${op.cashConfirmed ? 'checked' : ''} ${dis}> ยืนยันแล้วว่าเงินสดยกมาตรงกับที่นับจริง</label></div>
       <div class="field"><label class="f">หมายเหตุ</label><input name="openingNote" value="${esc(op.note || '')}" placeholder="เช่น นับเงินสดวันที่ … ได้ …" ${dis}></div>
-      <p class="small muted">ธนาคารตั้งตาม statement จริง 1 ต.ค. 69 (รับ 0.00 / จ่าย 29,536.00) สมุด PEAK เดิมแสดง 148,889.00 / −96,395.87</p>
+      <p class="small muted">ยอดธนาคารตั้งตาม statement จริง ณ วันเริ่มปีบัญชี เงินสดตั้งจากการนับจริง</p>
     </div>
     <div class="card"><div class="card-title">POS และกรรมการ</div>
       <div class="field"><label class="f">ดึงบิล POS ตั้งแต่วันที่</label><input name="posSyncFrom" type="date" value="${esc(st.posSyncFrom)}" ${dis}></div>
@@ -41,10 +41,10 @@ export function render() {
   </form>
   <div class="card mt"><div class="card-title">นำเข้าข้อมูลจาก PEAK (ครั้งเดียว)</div>
     <div class="row" style="justify-content:space-between">
-      <div class="small">รายจ่าย ต.ค.–พ.ย. 69 จาก PEAK 77 ใบ + ผู้ขาย 35 ราย + เจ้าหนี้ยกมาอมร 64,220 (ในระบบตอนนี้ ${peakCount} ใบ)<br><span class="muted">หมวดค่าใช้จ่ายเดาจากชื่อผู้ขาย ให้เจตตรวจแก้ได้ทีหลัง · กดซ้ำไม่ซ้ำรายการ</span></div>
+      <div class="small">รายจ่ายและผู้ขายช่วง ต.ค.–พ.ย. 69 จาก PEAK (ในระบบตอนนี้ ${peakCount} ใบ)<br><span class="muted">ใช้ไฟล์ seed ที่เก็บไว้ในเครื่อง ไม่ได้อยู่บนเว็บ · หมวดค่าใช้จ่ายเดาจากชื่อผู้ขาย ตรวจแก้ได้ทีหลัง · กดซ้ำไม่ซ้ำรายการ</span></div>
       <button class="btn btn-outline" data-act="stImportPeak" ${owner ? '' : 'disabled'}>นำเข้ารายจ่าย PEAK</button></div>
     <div class="row mt" style="justify-content:space-between">
-      <div class="small">รายการปรับปรุงจาก statement ต.ค.–พ.ย.: โอนบัญชีรับ→จ่าย 4 ครั้ง 120,000 · เงินกรรมการเข้า 3 ครั้ง 73,812.51 · คืนกรรมการ 2 ครั้ง 4,643</div>
+      <div class="small">รายการโอนระหว่างบัญชีและเงินกรรมการช่วง ต.ค.–พ.ย. 69 ที่อ่านจาก statement</div>
       <button class="btn btn-outline" data-act="stImportTransfers" ${owner ? '' : 'disabled'}>นำเข้ารายการโอน</button></div>
     ${DEMO ? '<div class="row mt" style="justify-content:space-between"><div class="small">โหมดทดลอง: ล้างข้อมูลทั้งหมดในเครื่องนี้</div><button class="btn btn-red btn-sm" data-act="stResetDemo">ล้างข้อมูลทดลอง</button></div>' : ''}
   </div>
