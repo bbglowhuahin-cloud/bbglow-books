@@ -25,6 +25,10 @@ export function render() {
       <div class="field"><label class="f">หมายเหตุ</label><input name="openingNote" value="${esc(op.note || '')}" placeholder="เช่น นับเงินสดวันที่ … ได้ …" ${dis}></div>
       <p class="small muted">ยอดธนาคารตั้งตาม statement จริง ณ วันเริ่มปีบัญชี เงินสดตั้งจากการนับจริง</p>
     </div>
+    <div class="card"><div class="card-title">ยอดยกมาอื่นในงบดุล (ใช้ในหน้า บัญชี)</div>
+      ${[['inventory', 'สินค้าคงเหลือ'], ['equipment', 'อุปกรณ์สำนักงาน (ราคาทุน)'], ['furniture', 'เครื่องตกแต่งสำนักงาน (ราคาทุน)'], ['accumDep', 'ค่าเสื่อมราคาสะสม'], ['payables', 'เจ้าหนี้การค้ายกมา'], ['pnd3', 'ภ.ง.ด.3 ค้างจ่าย'], ['pnd53', 'ภ.ง.ด.53 ค้างจ่าย'], ['sso', 'ประกันสังคมค้างจ่าย'], ['capital', 'ทุน'], ['retained', 'กำไร(ขาดทุน)สะสม (ติดลบถ้าขาดทุนสะสม)']].map(([k, t]) => `<div class="field"><label class="f">${t}</label><input name="bs.${k}" type="number" step="0.01" value="${(op.bs || {})[k] ?? 0}" ${dis}></div>`).join('')}
+      <p class="small muted">ตัวเลขจากงบทดลอง PEAK ณ 30 ก.ย. 69 · ผลต่างที่เกิดจากการตั้งเงินสด/ธนาคารตามยอดจริง ระบบแสดงเป็นบัญชี 333000 รอให้สำนักงานบัญชีปรับปรุง</p>
+    </div>
     <div class="card"><div class="card-title">POS และกรรมการ</div>
       <div class="field"><label class="f">ดึงบิล POS ตั้งแต่วันที่</label><input name="posSyncFrom" type="date" value="${esc(st.posSyncFrom)}" ${dis}></div>
       <div class="field"><label class="f">ชื่อกรรมการ</label><input name="director.name" value="${esc(st.director.name)}" ${dis}></div>
@@ -72,6 +76,7 @@ reg({
     st.company = { name: d['company.name'], taxId: d['company.taxId'], address: d['company.address'], phone: d['company.phone'] };
     CHANNELS.forEach(c => st.opening.balances[c.id] = Number(d['bal.' + c.id]) || 0);
     st.opening.cashConfirmed = !!d.cashConfirmed; st.opening.note = d.openingNote;
+    st.opening.bs = st.opening.bs || {}; Object.keys(d).filter(k => k.startsWith('bs.')).forEach(k => st.opening.bs[k.slice(3)] = Number(d[k]) || 0);
     st.posSyncFrom = d.posSyncFrom; st.director = { name: d['director.name'], keywords: d['director.keywords'].split(',').map(x => x.trim()).filter(Boolean) };
     st.pins = {}; Object.keys(ROLES).forEach(k => { if (d['pin.' + k]) st.pins[k] = d['pin.' + k]; });
     st.requireAuth = !!d.requireAuth; st.users = {};
