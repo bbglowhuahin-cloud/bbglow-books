@@ -11,11 +11,12 @@ import * as finance from './views/finance.js';
 import * as recon from './views/recon.js';
 import * as reports from './views/reports.js';
 import * as settings from './views/settings.js';
+import * as ledger from './views/ledger.js';
 
-const VIEWS = { dashboard, receipts, expenses, contacts, finance, recon, reports, settings };
+const VIEWS = { dashboard, receipts, expenses, contacts, finance, recon, reports, ledger, settings };
 const NAV = [
   ['dashboard', '🏠', 'หน้าหลัก'], ['receipts', '🧾', 'ใบเสร็จ'], ['expenses', '💸', 'รายจ่าย'], ['finance', '🏦', 'การเงิน'],
-  ['recon', '🔁', 'กระทบยอด'], ['contacts', '👥', 'ผู้ติดต่อ'], ['reports', '📊', 'รายงาน'], ['settings', '⚙️', 'ตั้งค่า'],
+  ['recon', '🔁', 'กระทบยอด'], ['contacts', '👥', 'ผู้ติดต่อ'], ['reports', '📊', 'รายงาน'], ['ledger', '📒', 'บัญชี'], ['settings', '⚙️', 'ตั้งค่า'],
 ];
 const MOBILE_NAV = ['dashboard', 'receipts', 'expenses', 'finance', 'reports'];
 const root = document.getElementById('root');
@@ -24,7 +25,7 @@ function shell() {
   const r = S.route;
   const links = NAV.map(([k, ic, t]) => `<a href="#/${k}" class="${r === k ? 'active' : ''}"><span class="ic">${ic}</span>${t}</a>`).join('');
   const mob = NAV.filter(([k]) => MOBILE_NAV.includes(k)).map(([k, ic, t]) => `<a href="#/${k}" class="${r === k ? 'active' : ''}"><span class="ic">${ic}</span>${t}</a>`).join('')
-    + `<a href="#/settings" class="${['settings', 'recon', 'contacts'].includes(r) ? 'active' : ''}"><span class="ic">⋯</span>อื่น ๆ</a>`;
+    + `<a href="#/settings" class="${['settings', 'recon', 'contacts', 'ledger'].includes(r) ? 'active' : ''}"><span class="ic">⋯</span>อื่น ๆ</a>`;
   return `<div id="app">
     <aside class="side">
       <div class="brand">BB <span>GLOW</span> <small>Books · ระบบบัญชี บีบี โกลว์ หัวหิน</small></div>
@@ -115,7 +116,7 @@ async function boot() {
     let first = true;
     store.listen('acc_settings', docs => {
       const m = docs.find(d => d.id === 'main');
-      S.settings = m ? { ...DEFAULT_SETTINGS, ...m, company: { ...DEFAULT_SETTINGS.company, ...(m.company || {}) }, opening: { ...DEFAULT_SETTINGS.opening, ...(m.opening || {}), balances: { ...DEFAULT_SETTINGS.opening.balances, ...((m.opening || {}).balances || {}) } }, director: { ...DEFAULT_SETTINGS.director, ...(m.director || {}) } } : { ...JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), _unsaved: true };
+      S.settings = m ? { ...DEFAULT_SETTINGS, ...m, company: { ...DEFAULT_SETTINGS.company, ...(m.company || {}) }, opening: { ...DEFAULT_SETTINGS.opening, ...(m.opening || {}), balances: { ...DEFAULT_SETTINGS.opening.balances, ...((m.opening || {}).balances || {}) }, bs: { ...DEFAULT_SETTINGS.opening.bs, ...((m.opening || {}).bs || {}) } }, director: { ...DEFAULT_SETTINGS.director, ...(m.director || {}) } } : { ...JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), _unsaved: true };
       if (first) { first = false; res(); } else if (S.ready) render();
     });
   });
