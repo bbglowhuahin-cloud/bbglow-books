@@ -25,7 +25,7 @@ export function render() {
     ${list.map(e => `<tr>
       <td class="small">${esc(e.no || '')}${e.source === 'peak' ? ' <span class="badge gray">PEAK</span>' : ''}${e.attachment ? ' 📎' : ''}</td><td>${thDate(e.date)}</td>
       <td>${esc(e.vendorName)}${e.desc ? `<br><span class="small muted">${esc(e.desc)}</span>` : ''}</td>
-      <td class="small">${esc(cat(e.category).name)}</td><td class="num">${fmt(e.amount)}</td>
+      <td class="small">${esc(cat(e.category).name)}</td><td class="num">${fmt(e.amount)}${e.vatAmount ? `<br><span class="small muted">ก่อน VAT ${fmt(e.vatBase)} + VAT ${fmt(e.vatAmount)}</span>` : ''}</td>
       <td class="num">${e.whtAmount ? fmt(e.whtAmount) + `<br><span class="small muted">${e.whtRate}% ${whtForm(e, S.contacts) === 'PND53' ? 'ภ.ง.ด.53' : 'ภ.ง.ด.3'}</span>` : '-'}</td>
       <td class="num"><b>${fmt(e.paid)}</b></td>
       <td>${e.status === 'unpaid' ? '<span class="pill" style="background:var(--crimson-light);color:var(--crimson)">ค้างจ่าย</span>' : `<span class="tag ${chan(e.channel).type}">${chan(e.channel).short}</span>`}</td>
@@ -52,9 +52,18 @@ export function openForm(e = null, preset = {}) {
       <div class="field"><label class="f">รายละเอียด (ถ้ามี)</label><input name="desc" value="${esc(d.desc || '')}" placeholder="เช่น ค่าเช่า พ.ย. 69"></div>
     </div>
     <div class="grid g3">
-      <div class="field"><label class="f">ยอดตามบิล (ก่อนหัก ณ ที่จ่าย)</label><input name="amount" type="number" step="0.01" min="0" value="${d.amount}" required data-input="exCalc"></div>
-      <div class="field"><label class="f">หัก ณ ที่จ่าย</label><select name="whtRate" data-on="exCalc">${WHT_RATES.map(r => `<option value="${r}" ${Number(d.whtRate) === r ? 'selected' : ''}>${r === 0 ? 'ไม่หัก' : r + '%'}</option>`).join('')}</select></div>
-      <div class="field"><label class="f">จ่ายจริง</label><input id="exPaid" value="${fmt(d.paid ?? d.amount)}" readonly style="background:#f6f0ea;font-weight:700"></div>
+      <div class="field"><label class="f">VAT ในบิล</label><select name="vatMode" data-on="exCalc">
+        <option value="none" ${(d.vatMode || 'none') === 'none' ? 'selected' : ''}>ไม่มี VAT</option>
+        <option value="incl" ${d.vatMode === 'incl' ? 'selected' : ''}>ยอดที่กรอกรวม VAT 7% แล้ว (ถอดออก)</option>
+        <option value="excl" ${d.vatMode === 'excl' ? 'selected' : ''}>ยอดที่กรอกยังไม่รวม VAT 7% (บวกเพิ่ม)</option></select></div>
+      <div class="field"><label class="f" id="exAmtLabel">ยอดตามบิล</label><input name="amount" type="number" step="0.01" min="0" value="${d.vatMode === 'excl' ? (d.vatBase ?? d.amount) : d.amount}" required data-input="exCalc"></div>
+      <div class="field"><label class="f">หัก ณ ที่จ่าย (คิดจากยอดก่อน VAT)</label><select name="whtRate" data-on="exCalc">${WHT_RATES.map(r => `<option value="${r}" ${Number(d.whtRate) === r ? 'selected' : ''}>${r === 0 ? 'ไม่หัก' : r + '%'}</option>`).join('')}</select></div>
+    </div>
+    <div class="grid g4" style="background:#FBF6F2;border-radius:12px;padding:10px 12px;margin-bottom:10px">
+      <div><div class="small muted">ยอดก่อน VAT</div><b id="exBase">0.00</b></div>
+      <div><div class="small muted">VAT 7% (รวมในต้นทุน ไม่ได้จด VAT)</div><b id="exVat">0.00</b></div>
+      <div><div class="small muted">รวมบิล</div><b id="exTotal">0.00</b></div>
+      <div><div class="small muted">จ่ายจริง (หลังหัก ณ ที่จ่าย)</div><b id="exPaid" style="color:var(--crimson)">0.00</b></div>
     </div>
     <div class="grid g2">
       <div class="field"><label class="f">จ่ายจากช่องทาง</label><select name="channel">${CHANNELS.map(c => `<option value="${c.id}" ${c.id === d.channel ? 'selected' : ''}>${c.name}${c.type === 'director' ? ' (อาจารย์จ่ายแทน)' : ''}</option>`).join('')}</select></div>
@@ -68,14 +77,24 @@ export function openForm(e = null, preset = {}) {
   </form>`);
   calc();
 }
+/** แยกยอดก่อน VAT / VAT / รวม / หัก ณ ที่จ่าย (คิดจากยอดก่อน VAT) / จ่ายจริง */
+export function splitAmounts(entered, vatMode, whtRate) {
+  entered = round2(Number(entered) || 0); whtRate = Number(whtRate) || 0;
+  let base, vat, total;
+  if (vatMode === 'incl') { base = round2(entered / 1.07); vat = round2(entered - base); total = entered; }
+  else if (vatMode === 'excl') { base = entered; vat = round2(entered * 0.07); total = round2(entered + vat); }
+  else { base = entered; vat = 0; total = entered; }
+  const wht = round2(base * whtRate / 100);
+  return { base, vat, total, wht, paid: round2(total - wht) };
+}
 function calc() {
   const f = document.getElementById('exForm'); if (!f) return;
-  const amt = Number(f.amount.value) || 0, rate = Number(f.whtRate.value) || 0;
-  const wht = round2(amt * rate / 100);
-  f.querySelector('#exPaid').value = fmt(amt - wht);
-  const v = f.vendorName.value;
-  const form = whtForm({ vendorName: v }, S.contacts);
-  f.querySelector('#whtHint').textContent = rate ? `หัก ${fmt(wht)} บาท → ออกหนังสือรับรอง 50 ทวิ และนำส่ง ${form === 'PND53' ? 'ภ.ง.ด.53 (นิติบุคคล)' : 'ภ.ง.ด.3 (บุคคลธรรมดา)'} ภายในวันที่ 7 ของเดือนถัดไป` : 'แนวทาง: ค่าเช่า 5% · ค่าบริการ/ค่าจ้าง/โฆษณา 3% · ค่าขนส่ง 1% · ซื้อสินค้า ไม่หัก';
+  const mode = f.vatMode.value, rate = Number(f.whtRate.value) || 0;
+  const a = splitAmounts(f.amount.value, mode, rate);
+  f.querySelector('#exAmtLabel').textContent = mode === 'excl' ? 'ยอดก่อน VAT ตามบิล' : mode === 'incl' ? 'ยอดรวมบิล (รวม VAT)' : 'ยอดตามบิล';
+  f.querySelector('#exBase').textContent = fmt(a.base); f.querySelector('#exVat').textContent = fmt(a.vat); f.querySelector('#exTotal').textContent = fmt(a.total); f.querySelector('#exPaid').textContent = fmt(a.paid);
+  const form = whtForm({ vendorName: f.vendorName.value }, S.contacts);
+  f.querySelector('#whtHint').textContent = rate ? `หัก ${rate}% ของยอดก่อน VAT ${fmt(a.base)} = ${fmt(a.wht)} บาท → ออกหนังสือรับรอง 50 ทวิ และนำส่ง ${form === 'PND53' ? 'ภ.ง.ด.53 (นิติบุคคล)' : 'ภ.ง.ด.3 (บุคคลธรรมดา)'} ภายในวันที่ 7 ของเดือนถัดไป` : 'แนวทาง: ค่าเช่า 5% · ค่าบริการ/ค่าจ้าง/โฆษณา 3% · ค่าขนส่ง 1% · ซื้อสินค้า ไม่หัก · บริษัทไม่ได้จด VAT จึงลง VAT รวมเป็นต้นทุน';
 }
 
 function certHtml(e) {
@@ -117,9 +136,10 @@ reg({
     const d = formData(f);
     if (!d.amount || d.amount < 0) return toast('กรอกยอดเงิน');
     const old = d.id ? S.expenses.find(x => x.id === d.id) : null;
-    const wht = round2(d.amount * d.whtRate / 100);
-    const doc = { ...(old || {}), id: d.id || uid('E'), date: d.date, vendorName: d.vendorName, category: d.category, desc: d.desc, amount: round2(d.amount),
-      whtRate: d.whtRate, whtBase: d.whtRate ? round2(d.amount) : 0, whtAmount: wht, paid: round2(d.amount - wht), channel: d.status === 'unpaid' ? '' : d.channel, status: d.status, attachment: d.attachment || '' };
+    const a = splitAmounts(d.amount, d.vatMode, d.whtRate); const wht = a.wht;
+    const doc = { ...(old || {}), id: d.id || uid('E'), date: d.date, vendorName: d.vendorName, category: d.category, desc: d.desc,
+      amount: a.total, vatMode: d.vatMode || 'none', vatBase: a.base, vatAmount: a.vat,
+      whtRate: Number(d.whtRate) || 0, whtBase: Number(d.whtRate) ? a.base : 0, whtAmount: wht, paid: a.paid, channel: d.status === 'unpaid' ? '' : d.channel, status: d.status, attachment: d.attachment || '' };
     if (!doc.no) doc.no = nextNo(S.expenses, 'EXP', d.date);
     if (wht && !doc.whtNo) doc.whtNo = nextNo(S.expenses.map(x => ({ no: x.whtNo })), 'WHT', d.date);
     if (d.status === 'paid' && (!old || old.status === 'unpaid')) doc.paidDate = d.date;
@@ -136,7 +156,7 @@ reg({
   printModal() { const m = modalEl().querySelector('.modal').innerHTML; const w = window.open('', '_blank'); w.document.write(`<html><head><meta charset="utf-8"><title>พิมพ์</title><link rel="stylesheet" href="${location.origin + location.pathname.replace(/[^/]*$/, '')}styles.css"></head><body style="background:#fff">${m}<script>setTimeout(()=>print(),400)</script></body></html>`); w.document.close(); },
   exExport() {
     const ui = S.ui.ex; const rows = S.expenses.filter(e => !ui.month || monthKey(e.date) === ui.month);
-    const head = csvRow(['เลขที่', 'วันที่', 'ผู้ขาย', 'รายละเอียด', 'รหัสหมวด', 'หมวด', 'ยอด', 'อัตราหัก', 'หัก ณ ที่จ่าย', 'จ่ายจริง', 'ช่องทาง', 'สถานะ', 'แบบ', 'เลขที่ 50ทวิ']);
-    downloadText(`expenses_${ui.month || 'all'}.csv`, [head, ...rows.map(e => csvRow([e.no, e.date, e.vendorName, e.desc, e.category, cat(e.category).name, e.amount, e.whtRate, e.whtAmount, e.paid, chan(e.channel).short, e.status, e.whtAmount ? whtForm(e, S.contacts) : '', e.whtNo]))].join('\n'));
+    const head = csvRow(['เลขที่', 'วันที่', 'ผู้ขาย', 'รายละเอียด', 'รหัสหมวด', 'หมวด', 'ยอดก่อน VAT', 'VAT', 'ยอดรวม', 'อัตราหัก', 'หัก ณ ที่จ่าย', 'จ่ายจริง', 'ช่องทาง', 'สถานะ', 'แบบ', 'เลขที่ 50ทวิ']);
+    downloadText(`expenses_${ui.month || 'all'}.csv`, [head, ...rows.map(e => csvRow([e.no, e.date, e.vendorName, e.desc, e.category, cat(e.category).name, e.vatBase ?? e.amount, e.vatAmount || 0, e.amount, e.whtRate, e.whtAmount, e.paid, chan(e.channel).short, e.status, e.whtAmount ? whtForm(e, S.contacts) : '', e.whtNo]))].join('\n'));
   },
 });
